@@ -1,11 +1,13 @@
 import { useState, useMemo, useEffect } from 'react';
 import { URLTable } from './components/URLTable';
 import { BulkImport } from './components/BulkImport';
+import { CrawlImport } from './components/CrawlImport';
 import { XMLPreview } from './components/XMLPreview';
 import { generateSitemap, estimateSize } from './utils/generateSitemap';
 
 const TABS = [
   { id: 'table', label: 'Add URLs' },
+  { id: 'crawl', label: 'Crawl Website' },
   { id: 'bulk', label: 'Bulk Import' },
   { id: 'preview', label: 'Preview & Download' },
 ];
@@ -68,6 +70,14 @@ export default function App() {
   };
 
   const handleBulkImport = (newRows) => {
+    setUrls((prev) => {
+      const hasOnlyEmpty = prev.length === 1 && !prev[0].url.trim();
+      return hasOnlyEmpty ? newRows : [...prev, ...newRows];
+    });
+    setActiveTab('table');
+  };
+
+  const handleCrawlImport = (newRows) => {
     setUrls((prev) => {
       const hasOnlyEmpty = prev.length === 1 && !prev[0].url.trim();
       return hasOnlyEmpty ? newRows : [...prev, ...newRows];
@@ -173,6 +183,14 @@ export default function App() {
               onUpdate={updateRow}
               onAdd={addRow}
               onRemove={removeRow}
+            />
+          )}
+
+          {activeTab === 'crawl' && (
+            <CrawlImport
+              onCrawlImport={handleCrawlImport}
+              defaultPriority={defaultPriority}
+              defaultChangefreq={defaultChangefreq}
             />
           )}
 
