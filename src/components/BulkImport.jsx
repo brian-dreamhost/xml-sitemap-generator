@@ -39,12 +39,14 @@ export function BulkImport({ onImport, defaultPriority, defaultChangefreq }) {
         </label>
         <textarea
           id="bulk-textarea"
+          name="bulk-urls"
           value={text}
           onChange={(e) => setText(e.target.value)}
           rows={12}
           placeholder={`https://example.com/\nhttps://example.com/about\nhttps://example.com/services\nhttps://example.com/contact`}
           className="w-full px-4 py-3 bg-midnight border border-metal/30 rounded-xl text-sm text-white placeholder-galactic focus:outline-none focus:border-azure focus:ring-1 focus:ring-azure font-mono resize-y"
           spellCheck={false}
+          autoComplete="off"
         />
         <p className="text-xs text-galactic mt-1">
           {urlCount > 0 ? (

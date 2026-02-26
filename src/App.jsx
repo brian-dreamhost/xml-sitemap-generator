@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { URLTable } from './components/URLTable';
 import { BulkImport } from './components/BulkImport';
 import { XMLPreview } from './components/XMLPreview';
@@ -11,6 +11,12 @@ const TABS = [
 ];
 
 const today = new Date().toISOString().split('T')[0];
+
+function getInitialTab() {
+  const params = new URLSearchParams(window.location.search);
+  const tab = params.get('tab');
+  return TABS.find((t) => t.id === tab) ? tab : 'table';
+}
 
 function makeRow(overrides = {}) {
   return {
@@ -26,9 +32,26 @@ function makeRow(overrides = {}) {
 
 export default function App() {
   const [urls, setUrls] = useState([makeRow()]);
-  const [activeTab, setActiveTab] = useState('table');
+  const [activeTab, setActiveTab] = useState(getInitialTab);
   const [defaultPriority, setDefaultPriority] = useState('0.5');
   const [defaultChangefreq, setDefaultChangefreq] = useState('weekly');
+
+  // Sync active tab to URL
+  const handleTabChange = (tabId) => {
+    setActiveTab(tabId);
+    const url = new URL(window.location);
+    url.searchParams.set('tab', tabId);
+    window.history.pushState({}, '', url);
+  };
+
+  // Warn before leaving with unsaved URLs
+  useEffect(() => {
+    const hasData = urls.some((u) => u.url.trim());
+    if (!hasData) return;
+    const handler = (e) => { e.preventDefault(); };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [urls]);
 
   const xml = useMemo(() => generateSitemap(urls), [urls]);
   const validCount = urls.filter((u) => u.include && u.url && u.url.trim()).length;
@@ -55,6 +78,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-abyss text-white bg-glow bg-grid">
       <div className="max-w-6xl mx-auto px-4 py-12 relative z-10 animate-fadeIn">
+      <main id="main">
 
         {/* Breadcrumb */}
         <nav className="mb-8 text-sm text-galactic">
@@ -71,7 +95,7 @@ export default function App() {
             <span className="w-1.5 h-1.5 rounded-full bg-turtle" />
             Free SEO Tool
           </div>
-          <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4">
+          <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4 text-pretty">
             XML Sitemap Generator
           </h1>
           <p className="text-lg text-cloudy max-w-2xl">
@@ -96,7 +120,7 @@ export default function App() {
             <select
               value={defaultPriority}
               onChange={(e) => setDefaultPriority(e.target.value)}
-              className="px-2 py-1 bg-midnight border border-metal/30 rounded text-sm text-cloudy focus:outline-none focus:border-azure"
+              className="px-2 py-1 bg-midnight border border-metal/30 rounded text-sm text-cloudy focus:outline-none focus:border-azure focus:ring-1 focus:ring-azure"
               aria-label="Default priority"
             >
               {['1.0','0.9','0.8','0.7','0.6','0.5','0.4','0.3','0.2','0.1'].map((p) => (
@@ -109,7 +133,7 @@ export default function App() {
             <select
               value={defaultChangefreq}
               onChange={(e) => setDefaultChangefreq(e.target.value)}
-              className="px-2 py-1 bg-midnight border border-metal/30 rounded text-sm text-cloudy focus:outline-none focus:border-azure"
+              className="px-2 py-1 bg-midnight border border-metal/30 rounded text-sm text-cloudy focus:outline-none focus:border-azure focus:ring-1 focus:ring-azure"
               aria-label="Default change frequency"
             >
               {['always','hourly','daily','weekly','monthly','yearly','never'].map((f) => (
@@ -124,7 +148,7 @@ export default function App() {
           {TABS.map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => handleTabChange(tab.id)}
               className={`px-5 py-2 rounded-lg text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-azure focus:ring-offset-1 focus:ring-offset-oblivion ${
                 activeTab === tab.id
                   ? 'bg-azure text-white'
@@ -174,13 +198,14 @@ export default function App() {
         {activeTab !== 'preview' && validCount > 0 && (
           <div className="mt-4 flex justify-end">
             <button
-              onClick={() => setActiveTab('preview')}
+              onClick={() => handleTabChange('preview')}
               className="px-6 py-2.5 bg-azure hover:bg-azure-hover text-white rounded-lg text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-azure focus:ring-offset-2 focus:ring-offset-abyss"
             >
-              Preview & Download Sitemap →
+              Preview & Download Sitemap <span aria-hidden="true">→</span>
             </button>
           </div>
         )}
+      </main>
       </div>
 
       {/* Footer */}

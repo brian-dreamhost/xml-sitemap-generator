@@ -26,10 +26,13 @@ export function URLTable({ urls, onUpdate, onAdd, onRemove }) {
           <div key={row.id} className="grid grid-cols-12 gap-2 items-center">
             <div className="col-span-12 sm:col-span-5">
               <input
-                type="text"
+                type="url"
                 value={row.url}
                 onChange={(e) => onUpdate(row.id, { url: e.target.value })}
                 placeholder="https://example.com/page"
+                autoComplete="url"
+                name="url"
+                spellCheck={false}
                 className={`w-full px-3 py-2 bg-midnight border rounded-lg text-sm text-white placeholder-galactic focus:outline-none focus:ring-1 font-mono ${
                   showError
                     ? 'border-coral/50 focus:border-coral focus:ring-coral'
@@ -71,7 +74,8 @@ export function URLTable({ urls, onUpdate, onAdd, onRemove }) {
                 type="date"
                 value={row.lastmod}
                 onChange={(e) => onUpdate(row.id, { lastmod: e.target.value })}
-                defaultValue={today}
+                name="lastmod"
+                autoComplete="off"
                 className="w-full px-2 py-2 bg-midnight border border-metal/30 rounded-lg text-sm text-cloudy focus:outline-none focus:border-azure focus:ring-1 focus:ring-azure"
                 aria-label="Last modified date"
               />
@@ -83,7 +87,7 @@ export function URLTable({ urls, onUpdate, onAdd, onRemove }) {
                 className="p-2 text-galactic hover:text-coral transition-colors disabled:opacity-30 disabled:cursor-not-allowed focus:outline-none focus:ring-1 focus:ring-coral rounded"
                 aria-label="Remove URL"
               >
-                <TrashIcon className="w-4 h-4" />
+                <TrashIcon className="w-4 h-4" aria-hidden="true" />
               </button>
             </div>
           </div>
@@ -92,9 +96,9 @@ export function URLTable({ urls, onUpdate, onAdd, onRemove }) {
 
       <button
         onClick={onAdd}
-        className="flex items-center gap-2 text-sm text-azure hover:text-white transition-colors focus:outline-none focus:underline"
+        className="flex items-center gap-2 text-sm text-azure hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-azure rounded"
       >
-        <PlusIcon className="w-4 h-4" />
+        <PlusIcon className="w-4 h-4" aria-hidden="true" />
         Add URL
       </button>
     </div>

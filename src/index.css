@@ -38,6 +38,7 @@
 }
 
 :root {
+  color-scheme: dark;
   --color-abyss: #000000;
   --color-oblivion: #111111;
   --color-midnight: #071C26;
@@ -73,6 +74,36 @@ body {
 
 .animate-fadeIn {
   animation: fadeIn 0.25s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fadeIn {
+    animation: none;
+  }
+  * {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+button, a {
+  touch-action: manipulation;
+}
+
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 0;
+  padding: 0.5rem 1rem;
+  background: var(--color-azure);
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  z-index: 9999;
+  border-radius: 0 0 0.5rem 0;
+  text-decoration: none;
+}
+.skip-link:focus {
+  top: 0;
 }
 
 .duration-250 {

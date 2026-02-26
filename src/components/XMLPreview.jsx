@@ -69,7 +69,7 @@ export function XMLPreview({ xml, urlCount }) {
   }, [xml]);
 
   return (
-    <div className="card-gradient border border-metal/20 rounded-2xl overflow-hidden">
+    <div className="overflow-hidden rounded-xl border border-metal/20">
       <div className="flex items-center justify-between px-4 py-3 border-b border-metal/20">
         <div className="flex items-center gap-2">
           <div className="w-2.5 h-2.5 rounded-full bg-coral" />
@@ -83,19 +83,19 @@ export function XMLPreview({ xml, urlCount }) {
             onClick={handleCopy}
             className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-galactic hover:text-white border border-metal/30 hover:border-metal/60 rounded-lg transition-colors focus:outline-none focus:ring-1 focus:ring-azure"
           >
-            <ClipboardIcon className="w-4 h-4" />
+            <ClipboardIcon className="w-4 h-4" aria-hidden="true" />
             Copy
           </button>
           <button
             onClick={handleDownload}
             className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-azure hover:bg-azure-hover text-white rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-azure focus:ring-offset-2 focus:ring-offset-abyss"
           >
-            <DownloadIcon className="w-4 h-4" />
+            <DownloadIcon className="w-4 h-4" aria-hidden="true" />
             Download
           </button>
         </div>
       </div>
-      <div className="p-4 overflow-auto max-h-[500px]">
+      <div className="p-4 overflow-auto max-h-[500px]" tabIndex={0} role="region" aria-label="Sitemap XML preview">
         {urlCount === 0 ? (
           <p className="text-galactic text-sm text-center py-8">Add URLs to generate your sitemap</p>
         ) : (
