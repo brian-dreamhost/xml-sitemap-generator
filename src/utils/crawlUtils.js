@@ -1,21 +1,34 @@
-const PROXY = 'https://corsproxy.io/?';
+// CORS proxies tried in order. If the first fails, fall back to the next.
+const PROXIES = [
+  (url) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+  (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+];
 
 /**
- * Fetch a URL through the CORS proxy and return the HTML string.
+ * Fetch a URL through CORS proxies (tries each in order) and return the HTML string.
+ * Throws with a descriptive message if all proxies fail.
  * @param {string} url - absolute URL to fetch
  * @param {AbortSignal} [signal] - optional AbortSignal for cancellation
  */
 export async function fetchViaProxy(url, signal) {
-  const res = await fetch(PROXY + encodeURIComponent(url), { signal });
-  if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
-  return res.text();
+  let lastError;
+  for (const buildUrl of PROXIES) {
+    try {
+      const res = await fetch(buildUrl(url), { signal });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.text();
+    } catch (err) {
+      if (err.name === 'AbortError') throw err;
+      lastError = err;
+    }
+  }
+  throw lastError;
 }
 
 /**
  * Normalise a URL for deduplication:
  * - Strip fragment (#)
  * - Strip trailing slash (except root path)
- * - Lowercase scheme + host
  */
 export function normalizeUrl(href) {
   try {
@@ -45,7 +58,6 @@ export function extractInternalLinks(html, baseUrl) {
   doc.querySelectorAll('a[href]').forEach((a) => {
     try {
       const resolved = new URL(a.getAttribute('href'), base);
-      // Same origin only, http/https only
       if (resolved.origin !== base.origin) return;
       if (!['http:', 'https:'].includes(resolved.protocol)) return;
       const norm = normalizeUrl(resolved.href);

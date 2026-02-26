@@ -29,6 +29,7 @@ export function CrawlImport({ onCrawlImport, defaultPriority, defaultChangefreq 
   const [status, setStatus] = useState('');
   const [error, setError] = useState('');
   const [isDone, setIsDone] = useState(false);
+  const [failedCount, setFailedCount] = useState(0);
 
   // Mutable BFS state — refs so mutations don't trigger re-renders
   const visitedRef = useRef(new Set());
@@ -40,6 +41,7 @@ export function CrawlImport({ onCrawlImport, defaultPriority, defaultChangefreq 
     setStatus('');
     setError('');
     setIsDone(false);
+    setFailedCount(0);
     visitedRef.current = new Set();
   };
 
@@ -59,7 +61,6 @@ export function CrawlImport({ onCrawlImport, defaultPriority, defaultChangefreq 
 
     reset();
     setIsRunning(true);
-    setError('');
 
     const controller = new AbortController();
     abortRef.current = controller;
@@ -68,10 +69,48 @@ export function CrawlImport({ onCrawlImport, defaultPriority, defaultChangefreq 
     const visited = visitedRef.current;
     visited.add(normalized);
 
-    // Queue entries: { url, depth }
-    const queue = [{ url: normalized, depth: 0 }];
     const allDiscovered = [];
+    let failed = 0;
 
+    // --- Test the start URL first so we can show a real error if it fails ---
+    setStatus('Connecting to site…');
+    let startHtml;
+    try {
+      startHtml = await fetchViaProxy(normalized, signal);
+    } catch (err) {
+      if (err.name === 'AbortError') {
+        setIsRunning(false);
+        return;
+      }
+      setIsRunning(false);
+      setIsDone(true);
+      setError(
+        `Could not fetch ${normalized}. ${err.message ? `(${err.message}) ` : ''}` +
+        `This usually means the site blocks external requests. ` +
+        `Try using Bulk Import instead and paste your URLs manually.`
+      );
+      return;
+    }
+
+    if (signal.aborted) {
+      setIsRunning(false);
+      return;
+    }
+
+    // Start URL succeeded — add it and enqueue its links
+    allDiscovered.push(normalized);
+    setDiscovered([normalized]);
+
+    const startLinks = extractInternalLinks(startHtml, normalized);
+    const queue = [];
+    for (const link of startLinks) {
+      if (!visited.has(link)) {
+        visited.add(link);
+        queue.push({ url: link, depth: 1 });
+      }
+    }
+
+    // --- BFS for remaining pages ---
     const processUrl = async ({ url, depth }) => {
       if (signal.aborted) return;
       try {
@@ -93,7 +132,8 @@ export function CrawlImport({ onCrawlImport, defaultPriority, defaultChangefreq 
         }
       } catch (err) {
         if (err.name === 'AbortError') return;
-        // Silently skip pages that fail (CORS block, 404, etc.)
+        failed++;
+        setFailedCount(failed);
       }
     };
 
@@ -107,9 +147,9 @@ export function CrawlImport({ onCrawlImport, defaultPriority, defaultChangefreq 
         setIsRunning(false);
         setIsDone(true);
         setStatus(
-          allDiscovered.length === 0
-            ? 'No pages found. The site may block our crawler.'
-            : `Done — ${allDiscovered.length} page${allDiscovered.length !== 1 ? 's' : ''} found.`
+          `Done — ${allDiscovered.length} page${allDiscovered.length !== 1 ? 's' : ''} found` +
+          (failed > 0 ? `, ${failed} skipped (blocked or not found)` : '') +
+          '.'
         );
       }
     }
@@ -220,10 +260,10 @@ export function CrawlImport({ onCrawlImport, defaultPriority, defaultChangefreq 
       )}
 
       {/* Progress */}
-      {(isRunning || isDone) && (
+      {(isRunning || isDone) && !error && (
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
-            <span className={isRunning ? 'text-tangerine' : discovered.length === 0 ? 'text-coral' : 'text-turtle'}>
+            <span className={isRunning ? 'text-tangerine' : 'text-turtle'}>
               {status}
             </span>
             <span className="text-galactic">{discovered.length} / {maxPages} pages</span>
