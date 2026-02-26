@@ -1,0 +1,125 @@
+@import "tailwindcss";
+
+/* Gilroy Font - using font-face for local hosting or fallback to system fonts */
+@font-face {
+  font-family: 'Gilroy';
+  src: url('/fonts/Gilroy-Regular.woff2') format('woff2'),
+       url('/fonts/Gilroy-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Gilroy';
+  src: url('/fonts/Gilroy-Medium.woff2') format('woff2'),
+       url('/fonts/Gilroy-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Gilroy';
+  src: url('/fonts/Gilroy-SemiBold.woff2') format('woff2'),
+       url('/fonts/Gilroy-SemiBold.woff') format('woff');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Gilroy';
+  src: url('/fonts/Gilroy-Bold.woff2') format('woff2'),
+       url('/fonts/Gilroy-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --color-abyss: #000000;
+  --color-oblivion: #111111;
+  --color-midnight: #071C26;
+  --color-white: #ffffff;
+  --color-azure: #0073EC;
+  --color-azure-hover: #0066d4;
+  --color-prince: #A644E5;
+  --color-turtle: #00CAAA;
+  --color-coral: #FF4A48;
+  --color-tangerine: #F59D00;
+  --color-sunflower: #FFDA00;
+  --color-off-white: #F4F6F9;
+  --color-smoke: #E0E4E8;
+  --color-cloudy: #AFBFC9;
+  --color-galactic: #677983;
+  --color-metal: #434F58;
+
+  font-family: 'Gilroy', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.5;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: var(--color-abyss);
+  color: var(--color-white);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.25s ease-out;
+}
+
+.duration-250 {
+  transition-duration: 250ms;
+}
+
+.bg-glow {
+  position: relative;
+  overflow: hidden;
+}
+
+.bg-glow::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -20%;
+  width: 60%;
+  height: 100%;
+  background: radial-gradient(ellipse at center, rgba(166, 68, 229, 0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.bg-grid {
+  background-image:
+    linear-gradient(rgba(67, 79, 88, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(67, 79, 88, 0.1) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+.card-gradient {
+  background: linear-gradient(180deg, rgba(17, 17, 17, 1) 0%, rgba(7, 28, 38, 0.5) 100%);
+}
+
+@theme {
+  --color-abyss: #000000;
+  --color-oblivion: #111111;
+  --color-midnight: #071C26;
+  --color-azure: #0073EC;
+  --color-azure-hover: #0066d4;
+  --color-prince: #A644E5;
+  --color-turtle: #00CAAA;
+  --color-coral: #FF4A48;
+  --color-tangerine: #F59D00;
+  --color-sunflower: #FFDA00;
+  --color-off-white: #F4F6F9;
+  --color-smoke: #E0E4E8;
+  --color-cloudy: #AFBFC9;
+  --color-galactic: #677983;
+  --color-metal: #434F58;
+}
