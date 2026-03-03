@@ -59,6 +59,30 @@ export default function App() {
   const validCount = urls.filter((u) => u.include && u.url && u.url.trim()).length;
   const sizeLabel = validCount > 0 ? estimateSize(xml) : '0 B';
 
+  const fillTestData = () => {
+    const testUrls = [
+      makeRow({ url: 'https://www.example.com/', priority: '1.0', changefreq: 'daily', lastmod: '2026-03-01' }),
+      makeRow({ url: 'https://www.example.com/about', priority: '0.8', changefreq: 'monthly', lastmod: '2026-02-15' }),
+      makeRow({ url: 'https://www.example.com/services', priority: '0.9', changefreq: 'weekly', lastmod: '2026-02-28' }),
+      makeRow({ url: 'https://www.example.com/services/web-design', priority: '0.8', changefreq: 'weekly', lastmod: '2026-02-20' }),
+      makeRow({ url: 'https://www.example.com/services/seo', priority: '0.8', changefreq: 'weekly', lastmod: '2026-02-20' }),
+      makeRow({ url: 'https://www.example.com/services/hosting', priority: '0.8', changefreq: 'weekly', lastmod: '2026-02-22' }),
+      makeRow({ url: 'https://www.example.com/blog', priority: '0.9', changefreq: 'daily', lastmod: '2026-03-01' }),
+      makeRow({ url: 'https://www.example.com/blog/how-to-improve-seo', priority: '0.7', changefreq: 'monthly', lastmod: '2026-01-15' }),
+      makeRow({ url: 'https://www.example.com/blog/website-speed-tips', priority: '0.7', changefreq: 'monthly', lastmod: '2026-02-10' }),
+      makeRow({ url: 'https://www.example.com/blog/choosing-a-domain-name', priority: '0.7', changefreq: 'yearly', lastmod: '2025-11-05' }),
+      makeRow({ url: 'https://www.example.com/contact', priority: '0.6', changefreq: 'monthly', lastmod: '2026-01-20' }),
+      makeRow({ url: 'https://www.example.com/pricing', priority: '0.9', changefreq: 'weekly', lastmod: '2026-02-25' }),
+      makeRow({ url: 'https://www.example.com/faq', priority: '0.5', changefreq: 'monthly', lastmod: '2026-01-10' }),
+      makeRow({ url: 'https://www.example.com/privacy-policy', priority: '0.3', changefreq: 'yearly', lastmod: '2025-06-01' }),
+      makeRow({ url: 'https://www.example.com/terms-of-service', priority: '0.3', changefreq: 'yearly', lastmod: '2025-06-01' }),
+    ];
+    setUrls(testUrls);
+    setDefaultPriority('0.5');
+    setDefaultChangefreq('weekly');
+    setActiveTab('table');
+  };
+
   const addRow = () => setUrls((prev) => [...prev, makeRow({ priority: defaultPriority, changefreq: defaultChangefreq })]);
 
   const updateRow = (id, changes) => {
@@ -87,7 +111,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-abyss text-white bg-glow bg-grid">
-      <div className="max-w-6xl mx-auto px-4 py-12 relative z-10 animate-fadeIn">
+      <div className="max-w-[1600px] mx-auto px-4 py-12 relative z-10 animate-fadeIn">
       <main id="main">
 
         {/* Breadcrumb */}
@@ -111,6 +135,13 @@ export default function App() {
           <p className="text-lg text-cloudy max-w-2xl">
             Generate a valid XML sitemap for your website. Add URLs individually or paste a bulk list, set priorities and frequencies, then download your sitemap.xml file.
           </p>
+        </div>
+
+        {/* Fill Test Data */}
+        <div className="flex justify-end mb-4">
+          <button type="button" onClick={fillTestData}
+            className="px-3 py-1.5 text-xs font-mono bg-prince/20 text-prince border border-prince/30 rounded hover:bg-prince/30 transition-colors focus:outline-none focus:ring-2 focus:ring-prince focus:ring-offset-2 focus:ring-offset-abyss"
+          >Fill Test Data</button>
         </div>
 
         {/* Stats bar */}
@@ -228,7 +259,7 @@ export default function App() {
 
       {/* Footer */}
       <footer className="border-t border-metal/30 mt-16">
-        <div className="max-w-6xl mx-auto px-4 py-6">
+        <div className="max-w-[1600px] mx-auto px-4 py-6">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-galactic">
             <p>Free XML Sitemap Generator — DreamHost Marketing Tools</p>
             <div className="flex items-center gap-4">
